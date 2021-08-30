@@ -5,7 +5,7 @@ ENV PHP_MEMORY_LIMIT=2G \
     DEBUG=false \
     MAGENTO_RUN_MODE=production \
     COMPOSER_ALLOW_SUPERUSER=1
-ENV PHP_EXTENSIONS bcmath bz2 calendar exif gd gettext intl mysqli opcache pdo_mysql redis soap sockets sysvmsg sysvsem sysvshm xsl zip pcntl
+ENV PHP_EXTENSIONS bcmath bz2 calendar exif gd gettext intl mysqli opcache pdo_mysql redis soap sockets sysvmsg sysvsem sysvshm xsl zip pcntl sodium
 
 # Configure Node.js version
 RUN curl -sL https://deb.nodesource.com/setup_8.x | bash
@@ -52,6 +52,7 @@ RUN apt-get update \
   libyaml-dev \
   libzip-dev \
   zip \
+  libsodium-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Install PyYAML
@@ -100,7 +101,8 @@ RUN docker-php-ext-install -j$(nproc) \
   xmlrpc \
   xsl \
   zip \
-  pcntl
+  pcntl \
+  sodium
 
 RUN pecl install -o -f \
   geoip-1.1.1 \
@@ -116,18 +118,18 @@ RUN pecl install -o -f \
   xdebug-2.6.1 \
   yaml
 
-RUN rm -f /usr/local/etc/php/conf.d/*sodium.ini \
-  && rm -f /usr/local/lib/php/extensions/*/*sodium.so \
-  && apt-get remove libsodium* -y  \
-  && mkdir -p /tmp/libsodium  \
-  && curl -sL https://github.com/jedisct1/libsodium/archive/1.0.18-RELEASE.tar.gz | tar xzf - -C  /tmp/libsodium \
-  && cd /tmp/libsodium/libsodium-1.0.18-RELEASE/ \
-  && ./configure \
-  && make && make check \
-  && make install  \
-  && cd / \
-  && rm -rf /tmp/libsodium  \
-  && pecl install -o -f libsodium
+#RUN rm -f /usr/local/etc/php/conf.d/*sodium.ini \
+#  && rm -f /usr/local/lib/php/extensions/*/*sodium.so \
+#  && apt-get remove libsodium* -y  \
+#  && mkdir -p /tmp/libsodium  \
+#  && curl -sL https://github.com/jedisct1/libsodium/archive/1.0.18-RELEASE.tar.gz | tar xzf - -C  /tmp/libsodium \
+#  && cd /tmp/libsodium/libsodium-1.0.18-RELEASE/ \
+#  && ./configure \
+#  && make && make check \
+#  && make install  \
+#  && cd / \
+#  && rm -rf /tmp/libsodium  \
+#  && pecl install -o -f libsodium
 
 RUN docker-php-ext-enable \
   bcmath \
@@ -168,7 +170,8 @@ RUN docker-php-ext-enable \
   xsl \
   yaml \
   zip \
-  pcntl
+  pcntl \
+  sodium
 
 ADD etc/php-cli.ini /usr/local/etc/php/conf.d/zz-magento.ini
 ADD etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug-settings.ini

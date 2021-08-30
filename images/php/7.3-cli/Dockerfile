@@ -5,7 +5,7 @@ ENV PHP_MEMORY_LIMIT=2G \
     DEBUG=false \
     MAGENTO_RUN_MODE=production \
     COMPOSER_ALLOW_SUPERUSER=1
-ENV PHP_EXTENSIONS bcmath bz2 calendar exif gd gettext intl mysqli opcache pdo_mysql redis soap sockets sysvmsg sysvsem sysvshm xsl zip pcntl
+ENV PHP_EXTENSIONS bcmath bz2 calendar exif gd gettext intl mysqli opcache pdo_mysql redis soap sockets sysvmsg sysvsem sysvshm xsl zip pcntl sodium
 
 # Configure Node.js version
 RUN curl -sL https://deb.nodesource.com/setup_8.x | bash
@@ -50,6 +50,7 @@ RUN apt-get update \
   libyaml-dev \
   libzip-dev \
   zip \
+  libsodium-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Install PyYAML
@@ -98,7 +99,8 @@ RUN docker-php-ext-install -j$(nproc) \
   xmlrpc \
   xsl \
   zip \
-  pcntl
+  pcntl \
+  sodium
 
 RUN pecl install -o -f \
   geoip-1.1.1 \
@@ -164,7 +166,8 @@ RUN docker-php-ext-enable \
   xsl \
   yaml \
   zip \
-  pcntl
+  pcntl \
+  sodium
 
 ADD etc/php-cli.ini /usr/local/etc/php/conf.d/zz-magento.ini
 ADD etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug-settings.ini

@@ -5,7 +5,7 @@ ENV MAGENTO_ROOT /app
 ENV DEBUG false
 ENV MAGENTO_RUN_MODE production
 ENV UPLOAD_MAX_FILESIZE 64M
-ENV PHP_EXTENSIONS bcmath bz2 calendar exif gd gettext intl mysqli opcache pdo_mysql redis soap sockets sysvmsg sysvsem sysvshm xsl zip pcntl
+ENV PHP_EXTENSIONS bcmath bz2 calendar exif gd gettext intl mysqli opcache pdo_mysql redis soap sockets sysvmsg sysvsem sysvshm xsl zip pcntl sodium
 
 # Install dependencies
 RUN apt-get update \
@@ -36,6 +36,7 @@ RUN apt-get update \
   libyaml-dev \
   libzip-dev \
   zip \
+  libsodium-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Configure the gd library
@@ -77,7 +78,8 @@ RUN docker-php-ext-install -j$(nproc) \
   xmlrpc \
   xsl \
   zip \
-  pcntl
+  pcntl \
+  sodium
 
 RUN pecl install -o -f \
   geoip-1.1.1 \
@@ -143,7 +145,8 @@ RUN docker-php-ext-enable \
   xsl \
   yaml \
   zip \
-  pcntl
+  pcntl \
+  sodium
 
 COPY etc/php-fpm.ini /usr/local/etc/php/conf.d/zz-magento.ini
 COPY etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug-settings.ini
